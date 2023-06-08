@@ -12,24 +12,25 @@ db_path = os.path.join(BASE_DIR, "database.db")
 db = peewee.SqliteDatabase(db_path)
 
 
-class User(peewee.Model):
+class BaseModel(peewee.Model):
+    class Meta:
+        database = db
+
+
+# MOA: dit stond eerst tussen haakjes: peewee.Model, nu Basemodel.
+# Daardoor hoef je niet overal class Meta: database = db te zetten.
+class User(BaseModel):
     first_name = peewee.CharField(max_length=30)
     last_name = peewee.CharField(max_length=30)
     address_data = peewee.CharField()
     bank_account_number = peewee.CharField()
 
-    class Meta:
-        database = db
 
-
-class Tag(peewee.Model):
+class Tag(BaseModel):
     name = peewee.CharField(unique=True, max_length=30)
 
-    class Meta:
-        database = db
 
-
-class Product(peewee.Model):
+class Product(BaseModel):
     name = peewee.CharField(max_length=255)
     description = peewee.CharField(max_length=150)
     # tag = peewee.ForeignKeyField(Tag, backref='products')
@@ -38,23 +39,14 @@ class Product(peewee.Model):
     amount_stock = peewee.IntegerField()
     owned_by_user = peewee.ForeignKeyField(User, backref='products')
 
-    class Meta:
-        database = db
 
-
-class ProductTag(peewee.Model):
+class ProductTag(BaseModel):
     product = peewee.ForeignKeyField(Product, backref='producttags')
     tag = peewee.ForeignKeyField(Tag, backref='tags')
 
-    class Meta:
-        database = db
 
-
-class Transactionbetsy(peewee.Model):
+class Transactionbetsy(BaseModel):
     updated_at = peewee.DateTimeField(default=date_now)
     t_user = peewee.ForeignKeyField(User, backref='transactionsbetsys1')
     t_product = peewee.ForeignKeyField(Product, backref='transactionsbetsys2')
     quantity = peewee.IntegerField()
-
-    class Meta:
-        database = db
